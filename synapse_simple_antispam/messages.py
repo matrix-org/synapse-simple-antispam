@@ -1,8 +1,10 @@
+import logging
 import re
 import yaml
 
+logger = logging.getLogger(__name__)
 
-class SimpleAntiSpam(object):
+class SimpleAntiSpam:
     def __init__(self, config):
         self.rules_file = config["rules_file"]
         self._reload_config()
@@ -29,19 +31,21 @@ class SimpleAntiSpam(object):
 
     def check_event_for_spam(self, event):
         for bad_hs in self._blocked_messages_by_homeserver:
-            if event.get("sender", "").endswith(":" + bad_hs):
+            if event.sender.endswith(":" + bad_hs):
+                logger.info("Soft-failing event %s from %s", bad_hs)
+                event.internal_metadata.soft_failed = True
                 return True # not allowed (spam)
 
         for bad_user in self._blocked_messages_by_user:
-            if event.get("sender", "") == bad_user:
+            if event.sender == bad_user:
                 return True # not allowed (spam)
 
         for msg in self._blocked_messages_by_text:
-            if event.get("content", {}).get("body", "") == msg:
+            if event.content.get("body", "") == msg:
                 return True # not allowed (spam)
 
         for msg in self._blocked_messages_by_pattern:
-            if msg.search(event.get("content", {}).get("body", "")):
+            if msg.search(event.content.get("body", "")):
                 return True # not allowed (spam)
 
         return False # not spam
