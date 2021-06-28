@@ -32,7 +32,7 @@ class SimpleAntiSpam:
     def check_event_for_spam(self, event):
         for bad_hs in self._blocked_messages_by_homeserver:
             if event.sender.endswith(":" + bad_hs):
-                logger.info("Soft-failing event %s from %s", bad_hs)
+                logger.info("Soft-failing event %s from %s", event.event_id,bad_hs)
                 event.internal_metadata.soft_failed = True
                 return True # not allowed (spam)
 
