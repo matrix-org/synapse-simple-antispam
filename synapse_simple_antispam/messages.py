@@ -23,9 +23,10 @@ class SimpleAntiSpam:
 
             self._blocked_messages_by_homeserver = spam_config.get("blocked_messages_by_homeserver", [])
             self._blocked_messages_by_user = spam_config.get("blocked_messages_by_user", [])
-            self._blocked_messages_by_text = spam_config.get("blocked_messages_by_text", [])
+            self._blocked_messages_by_content = spam_config.get("blocked_messages_by_content", [])
 
-            self._blocked_messages_by_pattern = [re.compile(v) for v in spam_config.get("blocked_messages_by_pattern", [])]
+            self._blocked_messages_by_user_pattern = [re.compile(v) for v in spam_config.get("blocked_messages_by_user_pattern", [])]
+            self._blocked_messages_by_content_pattern = [re.compile(v) for v in spam_config.get("blocked_messages_by_content_pattern", [])]
 
             self._blocked_invites_by_homeserver = spam_config.get("blocked_invites_by_homeserver", [])
 
@@ -40,11 +41,15 @@ class SimpleAntiSpam:
             if event.sender == bad_user:
                 return True # not allowed (spam)
 
-        for msg in self._blocked_messages_by_text:
+        for bad_user in self._blocked_messages_by_user_pattern:
+            if bad_user.search(event.sender):
+                return True # not allowed (spam)
+
+        for msg in self._blocked_messages_by_content:
             if event.content.get("body", "") == msg:
                 return True # not allowed (spam)
 
-        for msg in self._blocked_messages_by_pattern:
+        for msg in self._blocked_messages_by_content_pattern:
             if msg.search(event.content.get("body", "")):
                 return True # not allowed (spam)
 
