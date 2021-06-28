@@ -4,7 +4,8 @@ import yaml
 
 class SimpleAntiSpam(object):
     def __init__(self, config):
-        self._reload_config(config)
+        self.rules_file = config["rules_file"]
+        self._reload_config()
 
         try:
             from synapse.app._base import register_sighup
@@ -14,9 +15,8 @@ class SimpleAntiSpam(object):
                 "Failed to install sighup handler for anti spam rule reloading"
             )
 
-    def _reload_config(self, config):
-        logger.warning("LOOL")
-        with open(config["rules_file"])) as f:
+    def _reload_config(self, *args):
+        with open(self.rules_file) as f:
             spam_config = yaml.safe_load(f)
 
             self._blocked_messages_by_homeserver = spam_config.get("blocked_messages_by_homeserver", [])
@@ -26,7 +26,6 @@ class SimpleAntiSpam(object):
             self._blocked_messages_by_pattern = [re.compile(v) for v in spam_config.get("blocked_messages_by_pattern", [])]
 
             self._blocked_invites_by_homeserver = spam_config.get("blocked_invites_by_homeserver", [])
-        logger.warning("WUT")
 
     def check_event_for_spam(self, event):
         for bad_hs in self._blocked_messages_by_homeserver:
