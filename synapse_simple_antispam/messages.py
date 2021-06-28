@@ -56,7 +56,7 @@ class SimpleAntiSpam:
         return False # not spam
 
     def user_may_invite(self, inviter_user_id, invitee_user_id, room_id):
-        for bad_hs in self.blocked_invites_by_homeserver:
+        for bad_hs in self._blocked_invites_by_homeserver:
             if inviter_user_id.endswith(":" + bad_hs):
                 return False # not allowed
 
