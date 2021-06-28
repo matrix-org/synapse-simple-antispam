@@ -1,4 +1,5 @@
 import re
+import yaml
 
 
 class SimpleAntiSpam(object):
@@ -14,8 +15,9 @@ class SimpleAntiSpam(object):
             )
 
     def _reload_config(self, config):
-        with open(rules_file) as f:
-            spam_config = yaml.safe_load(config["rules_file"])
+        logger.warning("LOOL")
+        with open(config["rules_file"])) as f:
+            spam_config = yaml.safe_load(f)
 
             self._blocked_messages_by_homeserver = spam_config.get("blocked_messages_by_homeserver", [])
             self._blocked_messages_by_user = spam_config.get("blocked_messages_by_user", [])
@@ -24,6 +26,7 @@ class SimpleAntiSpam(object):
             self._blocked_messages_by_pattern = [re.compile(v) for v in spam_config.get("blocked_messages_by_pattern", [])]
 
             self._blocked_invites_by_homeserver = spam_config.get("blocked_invites_by_homeserver", [])
+        logger.warning("WUT")
 
     def check_event_for_spam(self, event):
         for bad_hs in self._blocked_messages_by_homeserver:
