@@ -1,5 +1,5 @@
 # synapse-simple-antispam
-A simple spam checker module for Synapse to block invites from unwanted homeservers
+A collection of spam checker modules for Synapse.
 
 
 ## Installation
